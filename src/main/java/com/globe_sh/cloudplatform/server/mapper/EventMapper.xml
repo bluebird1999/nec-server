@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.globe_sh.cloudplatform.server.dao.EventDAO">
+ 
+ <resultMap id="eventMessage" type="com.globe_sh.cloudplatform.server.entity.EventMessage">  
+     <id column="data_batch_id" property="dataBatchId" />  
+     <result column="sample_time" property="sampleTime" />  
+     <result column="decoded_time" property="decodedTime" />  
+     <result column="data_block" property="dataBlock" />
+     <result column="device" property="device" />
+     <result column="station" property="station" />   
+ </resultMap> 
+ 
+ <resultMap id="eventStatusMessage" type="com.globe_sh.cloudplatform.server.entity.EventStatusMessage">  
+     <id column="data_batch_id" property="dataBatchId" />  
+     <result column="code" property="attributeId" />  
+     <result column="value" property="attributeValue" /> 
+ </resultMap> 
+ 
+ <insert id="insert" parameterType="EventMessage" >
+  	insert into `i_decoded_data_batch`
+	  	(data_batch_id , sample_time, decoded_time, data_block, device, station)
+  	values(#{dataBatchId} , #{sampleTime} , #{decodedTime} , #{dataBlock}, #{device}, #{station})
+ </insert>
+ 
+ <insert id="insertEvent" parameterType="EventStatusMessage" >
+  	insert into `i_decoded_data`
+	  	(data_batch_id , code , value )
+  	values(#{dataBatchId} , #{attributeId} , #{attributeValue} )
+ </insert>
+ 
+ <insert id="insertBatchEvent" parameterType="EventStatusMessage" >
+  	insert into `i_decoded_data`
+	  	(data_batch_id , code , value )
+	select A.* from (
+	  	<foreach collection="list" item="item" index="index" open="" close="" separator="union all">
+			select #{item.dataBatchId}, #{item.attributeId}, #{item.attributeValue} from dual
+		</foreach>
+  	) A
+ </insert>  
+</mapper>

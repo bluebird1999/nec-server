@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+    http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd"
+	default-autowire="byName" default-init-method="init">
+	
+	<camelContext id="camelSpringContext" xmlns="http://camel.apache.org/schema/spring">
+		<route id="northDataMessage">
+			<from uri="activemq:topic:data-north" />
+			<process ref="northMessageProcess" />
+			<choice>
+           		<when>
+					<simple>${in.header.send} == 'Dirty'</simple>
+	           		<to uri="activemq:queue:dirty-queue" />
+           		</when>
+           		<when>
+					<simple>${in.header.send} == 'Status'</simple>
+	           		<to uri="activemq:queue:status-queue" />
+           		</when>
+           		<when>
+					<simple>${in.header.send} == 'Logout'</simple>
+	           		<to uri="activemq:queue:logout-queue" />
+           		</when>
+           		<when>
+					<simple>${in.header.send} == 'Success'</simple>
+	           		<to uri="activemq:topic:data-south" />
+           		</when>
+           		<when>
+					<simple>${in.header.send} == 'Invalid'</simple>
+	           		<to uri="activemq:queue:invalid-queue" />
+				</when>
+			</choice>
+		</route>
+		<route id="dealStatusMessage">
+			<from uri="activemq:queue:status-queue" />
+			<process ref="statusMessageProcess" />
+				<multicast>
+					<to uri="activemq:queue:cache-queue" />
+					<to uri="activemq:queue:persistent-queue" />
+					<to uri="activemq:queue:websocket-queue" />			
+				</multicast>			
+		</route>		
+		<route id="dealCacheMessage">
+			<from uri="activemq:queue:cache-queue" />
+			<process ref="cacheMessageProcess" />
+		</route>
+		<route id="dealPersistentMessage">
+			<from uri="activemq:queue:persistent-queue" />
+			<process ref="persistentMessageProcess" />
+		</route>
+	</camelContext>
+	
+	<bean class="com.globe_sh.cloudplatform.server.process.NorthMessageProcess" id="northMessageProcess" /> 
+	<bean class="com.globe_sh.cloudplatform.server.process.CacheMessageProcess" id="cacheMessageProcess" />
+	<bean class="com.globe_sh.cloudplatform.server.process.PersistentMessageProcess" id="persistentMessageProcess" >
+		<property name="eventService" ref="eventService" />
+	</bean>
+	<bean class="com.globe_sh.cloudplatform.server.process.StatusMessageProcess" id="statusMessageProcess" />
+	<bean class="com.globe_sh.cloudplatform.server.service.EventServiceImpl" id="eventService" />
+</beans> 

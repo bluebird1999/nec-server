@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.globe_sh.cloudplatform.server.dao.CodeDAO">
+ 
+ <resultMap id="codeEntityMap" type="com.globe_sh.cloudplatform.server.entity.CodeEntity">  
+     <result column="Code_ID" property="codeId" />  
+     <result column="Code_Name" property="codeName" />  
+     <result column="Code_Type" property="codeType" />  
+ </resultMap> 
+ 
+ <select id="getCodeName" resultType="String">
+  	select Code_Name  from `c_code` where Code_ID = #{0} and Code_Type = #{1} 
+ </select>
+ 
+ <select id="getAllCode" resultMap="codeEntityMap">
+  	select * from `c_code`
+ </select>
+ 
+ <select id="getStatusAttribute" resultMap="codeEntityMap">
+  		select a.Attribute_ID Code_ID, CONCAT(a.Attribute_Name,'##',b.Attribute_Unit_E_Name) Code_Name
+		from c_vehicle_status_attribute a, c_attribute_unit b
+		where a.Attribute_Unit_ID = b.Attribute_Unit_ID
+ </select>
+  
+</mapper>
