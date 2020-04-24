@@ -11,14 +11,13 @@ public class EventStatusMessage implements Serializable {
 	private static final long serialVersionUID = -7577685733460657229L;
 
 	private String dataBatchId;
-	private String attributeId;
+	private int attributeId;
 	private String attributeValue;
 	
 	public EventStatusMessage() {
-		
 	}
 	
-	public EventStatusMessage(String dataBatchId, String attributeId, String attributeValue) {
+	public EventStatusMessage(String dataBatchId, int attributeId, String attributeValue) {
 		this.dataBatchId = dataBatchId;
 		this.attributeId = attributeId;
 		this.attributeValue = attributeValue;
@@ -27,13 +26,13 @@ public class EventStatusMessage implements Serializable {
 	public String getDataBatchId() {
 		return dataBatchId;
 	}
-	public void setDataBatchId(String dataBatchId) {
+	public void setBatchId(String dataBatchId) {
 		this.dataBatchId = dataBatchId;
 	}
-	public String getAttributeId() {
+	public int getAttributeId() {
 		return attributeId;
 	}
-	public void setAttributeId(String attributeId) {
+	public void setAttributeId(int attributeId) {
 		this.attributeId = attributeId;
 	}
 	public String getAttributeValue() {

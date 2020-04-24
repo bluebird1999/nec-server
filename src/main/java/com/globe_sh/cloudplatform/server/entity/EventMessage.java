@@ -16,6 +16,7 @@ public class EventMessage implements Serializable {
 	private String dataBatchId;
 	private String station;
 	private String device;	
+	private int dataBlockId;
 	private String dataBlock;
 	private Timestamp decodedTime;
 	private Timestamp sampleTime;
@@ -38,6 +39,12 @@ public class EventMessage implements Serializable {
 	}
 	public void setDevice(String device) {
 		this.device = device;
+	}
+	public int getDataBlockId() {
+		return dataBlockId;
+	}
+	public void setDataBlockId(int dataBlockId) {
+		this.dataBlockId = dataBlockId;
 	}
 	public String getDataBlock() {
 		return dataBlock;
@@ -70,7 +77,7 @@ public class EventMessage implements Serializable {
 				+ "data_batch_id=" + dataBatchId
 				+ ", sample_time=" + StaticMethod.getTimeString(this.sampleTime) 				
 				+ ", decoded_time=" + StaticMethod.getTimeString(0)
-				+ ", data_block=" + dataBlock 
+				+ ", data_block=" + dataBlockId 
 				+ ", device=" + device 
 				+ ", station=" + station				
 				+ "]\n";
@@ -92,7 +99,7 @@ public class EventMessage implements Serializable {
 		this.sampleTime = StaticMethod.getTimestamp(json.getString("sample_time"));
 		this.decodedTime = StaticMethod.getTimestamp(json.getString("decoded_time"));
 		this.device = json.getString("device");
-		this.dataBlock = json.getString("data_block");			
+		this.dataBlockId = json.getIntValue("data_block");			
 		this.station = json.getString("station");
 		
 		JSONArray statusArray = json.getJSONArray("data");
@@ -101,7 +108,7 @@ public class EventMessage implements Serializable {
 		EventStatusMessage obj = null;
 		for(int i = 0; i < statusArray.size(); i++) {
 			statusJson = statusArray.getJSONObject(i);
-			obj = new EventStatusMessage(dataBatchId, statusJson.getString("code"), statusJson.getString("value"));
+			obj = new EventStatusMessage(dataBatchId, statusJson.getIntValue("code"), statusJson.getString("value"));
 			statusList.add(obj);
 		}
 	}
@@ -113,7 +120,7 @@ public class EventMessage implements Serializable {
 		json.put("data_batch_id", this.dataBatchId);
 		json.put("decoded_time", StaticMethod.getTimeString(0));
 		json.put("sample_time", StaticMethod.getTimeString(this.sampleTime));
-		json.put("data_block", this.dataBlock);
+		json.put("data_block", this.dataBlockId);
 		json.put("device", this.device);
 		json.put("station", this.station);
 		

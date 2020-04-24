@@ -27,11 +27,11 @@ public class DecoderBean {
 	public void setCreateTime(Timestamp createTime) {
 		this.createTime = createTime;
 	}	
-	public String getDataBlockCode() {
-		return dataBlockCode;
+	public int getDataBlock() {
+		return dataBlock;
 	}
-	public void setDataBlockCode(String dataBlockCode) {
-		this.dataBlockCode = dataBlockCode;
+	public void setDataBlock(int dataBlock) {
+		this.dataBlock = dataBlock;
 	}	
 	public String getDataName() {
 		return dataName;
@@ -87,10 +87,10 @@ public class DecoderBean {
 	public void setDataDeviation(int dataDeviation) {
 		this.dataDeviation = dataDeviation;
 	}
-	public String getDataUnit() {
+	public int getDataUnit() {
 		return dataUnit;
 	}
-	public void setDataUnit(String dataUnit) {
+	public void setDataUnit(int dataUnit) {
 		this.dataUnit = dataUnit;
 	}
 	public String getDataDictionary() {
@@ -118,7 +118,7 @@ public class DecoderBean {
 		this.id = json.getIntValue("id");													//参数表主键ID
 		this.dataCode = json.getString("data_code");												//信息类型标识
 		this.createTime = StaticMethod.getTimestamp(json.getString("create_time"));												//参数描述
-		this.dataBlockCode = json.getString("data_block_code");												//参数类型(byte,word,dword,bit,real)
+		this.dataBlock = json.getIntValue("data_block");												//参数类型(byte,word,dword,bit,real)
 		this.dataName = json.getString("data_name");
 		this.dataDescription = json.getString("data_description");
 		this.dataType = json.getString("data_type");
@@ -128,14 +128,14 @@ public class DecoderBean {
 		this.dataLength = json.getIntValue("data_length");	
 		this.dataPrecision = json.getDoubleValue("data_precision");								//参数精度
 		this.dataDeviation = json.getIntValue("data_deviation");							//参数长度
-		this.dataUnit = json.getString("data_unit");												//参数单位
+		this.dataUnit = json.getIntValue("data_unit");												//参数单位
 		this.dataDictionary = json.getString("data_dictionary");											//低字节在前
 	}
 
 	private int id;
 	private String dataCode;
 	private Timestamp createTime;
-	private String dataBlockCode;
+	private int dataBlock;
 	private String dataName;
 	private String dataDescription;
 	private String dataType;
@@ -145,7 +145,7 @@ public class DecoderBean {
 	private int dataLength;
 	private double dataPrecision;
 	private int dataDeviation;
-	private String dataUnit;
+	private int dataUnit;
 	private String dataDictionary;
 	private String lowPrecede="1";
 }

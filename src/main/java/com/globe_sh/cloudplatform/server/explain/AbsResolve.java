@@ -25,7 +25,7 @@ public abstract class AbsResolve implements Resolve {
 	}
 	
 	protected void endResolve(String value) {
-		EventStatusMessage statusMessage = new EventStatusMessage(uuid, decoder.getDataCode(), value);
+		EventStatusMessage statusMessage = new EventStatusMessage(uuid, decoder.getId(), value);
 		statusList.add(statusMessage);
 	}
 	

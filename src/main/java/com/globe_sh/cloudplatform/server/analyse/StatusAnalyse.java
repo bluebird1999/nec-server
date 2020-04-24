@@ -36,9 +36,10 @@ public class StatusAnalyse extends AbstractAnalyse {
 	private String station;
 	private String device;
 	private String dataBlock;
+	private int dataBlockId;
 	private Timestamp sampleTime;
 	private int realDataLength;				//real data length
-	private Map<String, List<DecoderBean>> decoderMap = new HashMap<String, List<DecoderBean>>();
+	private Map<Integer, List<DecoderBean>> decoderMap = new HashMap<Integer, List<DecoderBean>>();
 	private byte[] sourceData;	
 	private int dataStart = 0;
 	private int dataLength = 0;
@@ -89,7 +90,9 @@ public class StatusAnalyse extends AbstractAnalyse {
 			return;
 		}
 		
-		dataBlockDecoderList = JedisOperater.getDataDecoder(dataBlock);
+		String strId = JedisOperater.getDataBlock(device+dataBlock);
+		dataBlockId = Integer.parseInt(strId);
+		dataBlockDecoderList = JedisOperater.getDataDecoder(strId);
 		if(StaticMethod.isNull(dataBlockDecoderList)) {
 			logger.warn("Cannot find data decoder of station： " + station + " device: " + device + " data block: " + dataBlock );
 			return;
@@ -101,6 +104,7 @@ public class StatusAnalyse extends AbstractAnalyse {
 		eventMessage.setSampleTime(sampleTime);
 		eventMessage.setDecodedTime(new Timestamp(System.currentTimeMillis()));
 		eventMessage.setStation(station);
+		eventMessage.setDataBlockId(dataBlockId);
 		eventMessage.setDataBlock(dataBlock);
 		eventMessage.setDevice(device);
 		executeAnalyse();
@@ -113,7 +117,7 @@ public class StatusAnalyse extends AbstractAnalyse {
 		dataStart = StaticVariable.PROTOCOL_CONTROL_DATA_START;
 		Resolve resolve = null;
 		int tmpStart = dataStart;
-		List<DecoderBean> infoList = getProtocolByInfoFlag(this.dataBlock);
+		List<DecoderBean> infoList = getProtocolByInfoFlag(this.dataBlockId);
 		for(DecoderBean bean : infoList) {
 			resolve = ExplainFactory.getInstance().getResolve(bean);
 			resolve.preExecute(sourceData, tmpStart, uuid, statusList);
@@ -126,20 +130,20 @@ public class StatusAnalyse extends AbstractAnalyse {
 		for(String decoder : dataBlockDecoderList) {
 			bean = new DecoderBean();
 			bean.fromJsonString(decoder);
-			List<DecoderBean> list = decoderMap.get(this.dataBlock);
+			List<DecoderBean> list = decoderMap.get(this.dataBlockId);
 			if(list == null)
 				list = new ArrayList<DecoderBean>();
 			list.add(bean);
-			decoderMap.put(this.dataBlock, list);
+			decoderMap.put(this.dataBlockId, list);
 		}
-		for (Map.Entry<String,List<DecoderBean>> entry : decoderMap.entrySet()) {
+		for (Map.Entry<Integer,List<DecoderBean>> entry : decoderMap.entrySet()) {
 			List<DecoderBean> list = entry.getValue();
-			String param = entry.getKey();
+			Integer param = entry.getKey();
 			logger.info("The decoder build code: " + param + "\tSize: " + list.size());
 		}
 	}
 	
-	private List<DecoderBean> getProtocolByInfoFlag(String paramCode) {
+	private List<DecoderBean> getProtocolByInfoFlag(Integer paramCode) {
 		return decoderMap.get(paramCode);
 	}
 	
