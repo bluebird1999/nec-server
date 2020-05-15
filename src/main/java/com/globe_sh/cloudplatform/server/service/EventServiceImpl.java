@@ -38,22 +38,12 @@ public class EventServiceImpl extends BaseServiceImpl<EventMessage, String> impl
 	
 	public void insertEvent(EventMessage eventMessage) {
 		insert(eventMessage);
-		String vehicleId = eventMessage.getStation();
-		Timestamp sampleTime = eventMessage.getSampleTime();
-		String lon = "";
-		String lat = "";
 		List<EventStatusMessage> statusList = eventMessage.getStatusList();
 		List<EventStatusMessage> batchList = new ArrayList<EventStatusMessage>();
 		try {
 			session = sqlSessionFactory.openSession(ExecutorType.BATCH, false);
 			batchEventDAO = session.getMapper(EventDAO.class);
 			for(EventStatusMessage eventStatusMessage : statusList) {
-				if("p_5_0_1_0".equals(eventStatusMessage.getAttributeId())) {
-					lon = eventStatusMessage.getAttributeValue();
-				} 
-				if("p_5_0_5_0".equals(eventStatusMessage.getAttributeId())) {
-					lat = eventStatusMessage.getAttributeValue();
-				} 
 				batchList.add(eventStatusMessage);				
 			}
 			batchEventDAO.insertBatchEvent(batchList);
@@ -65,18 +55,6 @@ public class EventServiceImpl extends BaseServiceImpl<EventMessage, String> impl
 		} finally {
 			if(session != null)
 				session.close();
-		}
-		
-		try {
-			if(!StaticMethod.isNull(lon) && !StaticMethod.isNull(lat)) {
-				if(0 != Double.parseDouble(lon) && 0 != Double.parseDouble(lat)) {
-					logger.info("车辆位置信息更新<" + vehicleId + ">， Lat: " + lat + "\tLon: " + lon );
-					eventDAO.updateLocation(vehicleId, "" + lon, "" + lat);
-				}
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
+		}		
 	}
 }

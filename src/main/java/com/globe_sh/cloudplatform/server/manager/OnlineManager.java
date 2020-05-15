@@ -98,7 +98,7 @@ public class OnlineManager {
 			bean.setLoginResult(StaticVariable.STATION_RESPONSE_DUPLICATE);
 			return;
 		} else {
-			String status = JedisOperater.getOnlineStatus(bean.getStation());
+			String status = JedisOperater.getOnlineStatus(String.valueOf(bean.getStation()));
 			if(!StaticMethod.isNull(status)) {
 				JSONObject json = JSONObject.parseObject(status);
 				if (json.containsKey("Status") && StaticVariable.STATION_STATUS_ONLINE.equals(json.get("Status"))) {
@@ -110,7 +110,7 @@ public class OnlineManager {
 		}
 
 		JSONObject json = null;
-		String status = JedisOperater.getOnlineStatus(bean.getStation());
+		String status = JedisOperater.getOnlineStatus(String.valueOf(bean.getStation()));
 		if (StaticMethod.isNull(status)) {
 			json = new JSONObject();
 		} else {
@@ -122,7 +122,7 @@ public class OnlineManager {
 				} else {
 					json.put("Status", StaticVariable.STATION_STATUS_OFFLINE);
 					bean.setLoginResult(StaticVariable.STATION_RESPONSE_FAILURE);
-					JedisOperater.updateOnlineStatus(bean.getStation(), json.toJSONString());
+					JedisOperater.updateOnlineStatus(String.valueOf(bean.getStation()), json.toJSONString());
 					return;
 				}
 			}
@@ -135,8 +135,8 @@ public class OnlineManager {
 		json.put("Operater", StaticVariable.LOGIN_OPERATER_DEVICE);
 		json.put("ClientId", bean.getClientId());
 		json.put("ProcessTime", StaticMethod.getTimeString(0));
-		JedisOperater.updateOnlineStatus(bean.getStation(), json.toJSONString());
-		loginMap.put(bean.getClientId(), bean.getStation());
+		JedisOperater.updateOnlineStatus(String.valueOf(bean.getStation()), json.toJSONString());
+		loginMap.put(bean.getClientId(), String.valueOf(bean.getStation()));
 		bean.setLoginResult(StaticVariable.STATION_RESPONSE_SUCCESS);
 
 		long now = System.currentTimeMillis();
@@ -155,7 +155,7 @@ public class OnlineManager {
 		}
 		
 		JSONObject json = null;
-		String status = JedisOperater.getOnlineStatus(bean.getStation());
+		String status = JedisOperater.getOnlineStatus(String.valueOf(bean.getStation()));
 		if (StaticMethod.isNull(status)) {
 			bean.setLogoutResult(StaticVariable.STATION_RESPONSE_FAILURE);
 			return;
@@ -171,7 +171,7 @@ public class OnlineManager {
 		json.put("OfflineTime", StaticMethod.getTimeString(bean.getLogoutTime()));
 		json.put("Operater", StaticVariable.LOGIN_OPERATER_DEVICE);
 		json.put("ProcessTime", StaticMethod.getTimeString(0));
-		JedisOperater.updateOnlineStatus(bean.getStation(), json.toJSONString());
+		JedisOperater.updateOnlineStatus(String.valueOf(bean.getStation()), json.toJSONString());
 		loginMap.remove(bean.getClientId());
 		heartMap.remove(bean.getClientId());
 		expireList.add(bean.getClientId());
@@ -225,15 +225,15 @@ public class OnlineManager {
 		return loginMap.containsKey(clientId);
 	}
 	
-	public void heart(String station) {
+	public void heart(int station) {
 		JSONObject json = null;
-		String status = JedisOperater.getOnlineStatus(station);
+		String status = JedisOperater.getOnlineStatus(String.valueOf(station));
 		if (!StaticMethod.isNull(status)) {
 			long now = System.currentTimeMillis();
 			json = JSONObject.parseObject(status);
 			json.put("HeartTime", StaticMethod.getTimeString(0));
 			heartMap.put(json.getString("ClientId"), now);
-			JedisOperater.updateOnlineStatus(station, json.toJSONString());
+			JedisOperater.updateOnlineStatus(String.valueOf(station), json.toJSONString());
 		}
 	}
 

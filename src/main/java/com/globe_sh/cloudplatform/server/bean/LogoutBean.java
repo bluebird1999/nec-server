@@ -4,13 +4,13 @@ import java.sql.Timestamp;
 
 public class LogoutBean {
 
-	private String station;
+	private int station;
 	private String clientId;
 	private Timestamp logoutTime;
 	private short loginSeq;
 	private byte logoutResult;
 	
-	public LogoutBean(String clientId, String station, Timestamp logoutTime, short loginSeq) {
+	public LogoutBean(String clientId, int station, Timestamp logoutTime, short loginSeq) {
 		this.clientId = clientId;
 		this.station = station;
 		this.logoutTime = logoutTime;
@@ -18,11 +18,11 @@ public class LogoutBean {
 		this.logoutResult = (byte)0x00;
 	}
 
-	public String getStation() {
+	public int getStation() {
 		return station;
 	}
 
-	public void setStation(String station) {
+	public void setStation(int station) {
 		this.station = station;
 	}
 

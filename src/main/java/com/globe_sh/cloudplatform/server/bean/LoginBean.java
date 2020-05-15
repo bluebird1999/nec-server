@@ -3,14 +3,14 @@ package com.globe_sh.cloudplatform.server.bean;
 import java.sql.Timestamp;
 
 public class LoginBean {
-	private String station;			//8 bytes
+	private int station;			//
 	private String clientId;		//60 bytes
 	private Timestamp loginTime;		//8 bytes
 	private short loginSeq;	
 	private short number;
 	private byte loginResult;
 	
-	public LoginBean(String clientId, String station, Timestamp loginTime, short loginSeq, short number) {
+	public LoginBean(String clientId, int station, Timestamp loginTime, short loginSeq, short number) {
 		this.clientId = clientId;
 		this.station = station;
 		this.loginTime = loginTime;
@@ -19,11 +19,11 @@ public class LoginBean {
 		this.loginResult = (byte)0x00;
 	}
 
-	public String getStation() {
+	public int getStation() {
 		return station;
 	}
 
-	public void setStation(String station) {
+	public void setStation(int station) {
 		this.station = station;
 	}
 	

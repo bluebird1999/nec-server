@@ -18,7 +18,7 @@ public class CacheMessageProcess implements Processor {
 			String statusString = new String(exchange);
 			EventMessage eventMessage = new EventMessage();
 			eventMessage.fromJsonString(statusString);
-			String key = eventMessage.getStation();
+			String key = String.valueOf( eventMessage.getStation() );
 			String value = statusString;
 			if(eventMessage.getStatusList() != null && eventMessage.getStatusList().size() > 0) {
 				JedisOperater.updateStationStatus(key, value);

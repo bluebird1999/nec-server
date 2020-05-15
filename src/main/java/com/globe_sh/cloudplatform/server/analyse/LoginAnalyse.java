@@ -36,12 +36,11 @@ public class LoginAnalyse extends AbstractAnalyse {
 		byte[] sourceData = this.dataPackage.getSourceData();
 		int dataLength = sourceData.length;
 		
-		String station = new String( Arrays.copyOfRange(sourceData, StaticVariable.PROTOCOL_CONTROL_STATION_START, 
-				StaticVariable.PROTOCOL_CONTROL_STATION_START + StaticVariable.PROTOCOL_CONTROL_STATION_LENGTH ) ).trim();
+		int station = ByteArrayUtil.getIntLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_STATION_START); 			
 //		Timestamp loginTime = StaticMethod.getTimestampOrigin( sourceData, StaticVariable.PROTOCOL_CONTROL_DATATIME_START);
 		short loginSeq = ByteArrayUtil.getShortLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_LOGINSEQ_START);
 		short number = ByteArrayUtil.getShortLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_NUMBER_START);
-		
+
 		Timestamp loginTime = new Timestamp(System.currentTimeMillis());
 		LoginBean bean = new LoginBean(this.dataPackage.getClientId(), station, loginTime, loginSeq, number);
 		OnlineManager.getInstance().login(bean);

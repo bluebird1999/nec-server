@@ -31,16 +31,16 @@ public class TimingAnalyse extends AbstractAnalyse {
 
 	public void processMessage() {
 		byte[] sourceData = this.dataPackage.getSourceData();		
-		byte[] data = new byte[33];
-		System.arraycopy(sourceData, 0, data, 0, 24);
+		byte[] data = new byte[29];
+		System.arraycopy(sourceData, 0, data, 0, 20);
 		Timestamp st = new Timestamp(System.currentTimeMillis());
 		byte[] time = StaticMethod.timeStampToBytes(st);
-		System.arraycopy(time, 0, data, 24, 8);
+		System.arraycopy(time, 0, data, 20, 8);
 		data[3] = (byte)0x00;		//response
-		data[22] = (byte)0x00;		//
-		data[23] = (byte)0x08;		//data length
+		data[18] = (byte)0x00;		//
+		data[19] = (byte)0x08;		//data length
 		byte bcc = CRC8.calcCrc8WithoutPrefix(data);
-		data[32] = bcc;
+		data[28] = bcc;
 		
 		this.dataPackage.setSourceData(data);
 		this.dataPackage.pack();

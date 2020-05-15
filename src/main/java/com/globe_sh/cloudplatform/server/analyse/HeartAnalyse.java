@@ -3,6 +3,7 @@ package com.globe_sh.cloudplatform.server.analyse;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import com.globe_sh.cloudplatform.common.util.ByteArrayUtil;
 import com.globe_sh.cloudplatform.common.util.CRC8;
 import com.globe_sh.cloudplatform.common.util.StaticMethod;
 import com.globe_sh.cloudplatform.common.util.StaticVariable;
@@ -24,15 +25,14 @@ public class HeartAnalyse extends AbstractAnalyse {
 	public void processMessage() {
 		if (auth) {
 			byte[] sourceData = this.dataPackage.getSourceData();
-			String station = StaticMethod.ascii2String(sourceData, StaticVariable.PROTOCOL_CONTROL_STATION_START,
-					StaticVariable.PROTOCOL_CONTROL_STATION_LENGTH);
+			int station = ByteArrayUtil.getIntLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_STATION_START);
 			OnlineManager.getInstance().heart(station);
 			
-			byte[] data = new byte[25];
-			System.arraycopy(sourceData, 0, data, 0, 24);
+			byte[] data = new byte[21];
+			System.arraycopy(sourceData, 0, data, 0, 20);
 			data[3] = (byte)0x00;		//response
 			byte bcc = CRC8.calcCrc8WithoutPrefix(data);
-			data[24] = bcc;
+			data[20] = bcc;
 			
 			this.dataPackage.setSourceData(data);
 			this.dataPackage.pack();	

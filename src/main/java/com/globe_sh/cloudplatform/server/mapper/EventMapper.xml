@@ -8,9 +8,11 @@
      <id column="batch" property="dataBatchId" />  
      <result column="sample_time" property="sampleTime" />  
      <result column="decoded_time" property="decodedTime" />  
-     <result column="data_block" property="dataBlockId" />
+     <result column="data_block" property="dataBlock" />
      <result column="device" property="device" />
-     <result column="station" property="station" />   
+     <result column="station" property="station" />  
+     <result column="line" property="line" />
+     <result column="factory" property="factory" />       
  </resultMap> 
  
  <resultMap id="eventStatusMessage" type="com.globe_sh.cloudplatform.server.entity.EventStatusMessage">  
@@ -21,8 +23,8 @@
  
  <insert id="insert" parameterType="EventMessage" >
   	insert into `i_decoded_data_batch`
-	  	(batch, sample_time, decoded_time, data_block, device, station)
-  	values(#{dataBatchId} , #{sampleTime} , #{decodedTime} , #{dataBlockId}, #{device}, #{station})
+	  	(batch, sample_time, decoded_time, data_block, device, station, line, factory)
+  	values(#{dataBatchId} , #{sampleTime} , #{decodedTime} , #{dataBlock}, #{device}, #{station}, #{line}, #{factory})
  </insert>
  
  <insert id="insertEvent" parameterType="EventStatusMessage" >

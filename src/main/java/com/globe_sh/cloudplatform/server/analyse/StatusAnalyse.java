@@ -33,10 +33,10 @@ public class StatusAnalyse extends AbstractAnalyse {
 	private StationService stationService;
 	private String uuid;
 	private Timestamp statusTime;
-	private String station;
-	private String device;
-	private String dataBlock;
-	private int dataBlockId;
+	private int line;
+	private int station;
+	private int device;
+	private int dataBlock;
 	private Timestamp sampleTime;
 	private int realDataLength;				//real data length
 	private Map<Integer, List<DecoderBean>> decoderMap = new HashMap<Integer, List<DecoderBean>>();
@@ -73,15 +73,13 @@ public class StatusAnalyse extends AbstractAnalyse {
 		sourceData = this.dataPackage.getSourceData();
 		
 		logger.info("Data: " + StaticMethod.bytesToHexString(sourceData));
-		station = StaticMethod.ascii2String(sourceData, 
-				StaticVariable.PROTOCOL_CONTROL_STATION_START, StaticVariable.PROTOCOL_CONTROL_STATION_LENGTH).trim();
+		station = ByteArrayUtil.getIntLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_STATION_START); 	
 		uuid = StaticMethod.get32UUID();
 		statusTime = StaticMethod.getTimestampOrigin(sourceData, StaticVariable.PROTOCOL_CONTROL_DATATIME_START);
 		dataLength = ByteArrayUtil.getShortLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_DATALENGTH_START);
-		device = StaticMethod.ascii2String(sourceData, 
-				StaticVariable.PROTOCOL_CONTROL_DEVICE_START, StaticVariable.PROTOCOL_CONTROL_DEVICE_LENGTH).trim();
-		dataBlock = StaticMethod.ascii2String(sourceData, 
-				StaticVariable.PROTOCOL_CONTROL_DB_START, StaticVariable.PROTOCOL_CONTROL_DB_LENGTH).trim();		
+		line = ByteArrayUtil.getIntLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_LINE_START); 
+		device = ByteArrayUtil.getIntLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_DEVICE_START);
+		dataBlock = ByteArrayUtil.getIntLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_DB_START);	
 		sampleTime = StaticMethod.getTimestampOrigin(sourceData, StaticVariable.PROTOCOL_CONTROL_SAMPLETIME_START);
 		realDataLength = ByteArrayUtil.getShortLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_REALDATALENGTH_START);
 		StationBean stationBean = stationService.getStationBean(station);
@@ -89,10 +87,7 @@ public class StatusAnalyse extends AbstractAnalyse {
 			logger.info("invalid station bean");
 			return;
 		}
-		
-		String strId = JedisOperater.getDataBlock(device+dataBlock);
-		dataBlockId = Integer.parseInt(strId);
-		dataBlockDecoderList = JedisOperater.getDataDecoder(strId);
+		dataBlockDecoderList = JedisOperater.getDataDecoder(String.valueOf(dataBlock));
 		if(StaticMethod.isNull(dataBlockDecoderList)) {
 			logger.warn("Cannot find data decoder of station： " + station + " device: " + device + " data block: " + dataBlock );
 			return;
@@ -104,9 +99,10 @@ public class StatusAnalyse extends AbstractAnalyse {
 		eventMessage.setSampleTime(sampleTime);
 		eventMessage.setDecodedTime(new Timestamp(System.currentTimeMillis()));
 		eventMessage.setStation(station);
-		eventMessage.setDataBlockId(dataBlockId);
 		eventMessage.setDataBlock(dataBlock);
 		eventMessage.setDevice(device);
+		eventMessage.setLine(line);
+		eventMessage.setFactory(stationBean.getFactoryId());
 		executeAnalyse();
 		eventMessage.setStatusList(statusList);
 	}
@@ -117,7 +113,7 @@ public class StatusAnalyse extends AbstractAnalyse {
 		dataStart = StaticVariable.PROTOCOL_CONTROL_DATA_START;
 		Resolve resolve = null;
 		int tmpStart = dataStart;
-		List<DecoderBean> infoList = getProtocolByInfoFlag(this.dataBlockId);
+		List<DecoderBean> infoList = getProtocolByInfoFlag(this.dataBlock);
 		for(DecoderBean bean : infoList) {
 			resolve = ExplainFactory.getInstance().getResolve(bean);
 			resolve.preExecute(sourceData, tmpStart, uuid, statusList);
@@ -130,11 +126,11 @@ public class StatusAnalyse extends AbstractAnalyse {
 		for(String decoder : dataBlockDecoderList) {
 			bean = new DecoderBean();
 			bean.fromJsonString(decoder);
-			List<DecoderBean> list = decoderMap.get(this.dataBlockId);
+			List<DecoderBean> list = decoderMap.get(this.dataBlock);
 			if(list == null)
 				list = new ArrayList<DecoderBean>();
 			list.add(bean);
-			decoderMap.put(this.dataBlockId, list);
+			decoderMap.put(this.dataBlock, list);
 		}
 		for (Map.Entry<Integer,List<DecoderBean>> entry : decoderMap.entrySet()) {
 			List<DecoderBean> list = entry.getValue();
@@ -148,7 +144,7 @@ public class StatusAnalyse extends AbstractAnalyse {
 	}
 	
 	private byte[] getSendData() {	
-		int staticLength = 53;
+		int staticLength = 45;
 		byte[] data = new byte[staticLength];
 	
 		data[0] = (byte)0x23;        
@@ -158,43 +154,35 @@ public class StatusAnalyse extends AbstractAnalyse {
 		data[4] = (byte)0x00;
 		data[5] = (byte)0x00;
 	
-		String station = eventMessage.getStation();
-		System.arraycopy(station.getBytes(), 0, data, 6, station.getBytes().length);
-		for(int i = station.getBytes().length; i<8; i++) {
-			data[i + 6] = (byte)0x00;
-		}
-		
+		int station = eventMessage.getStation();
+		System.arraycopy(StaticMethod.intToByteArray(station), 0, data, StaticVariable.PROTOCOL_CONTROL_STATION_START, 4);		
 		Timestamp st = eventMessage.getDecodedTime();
 		Timestamp sp = eventMessage.getSampleTime();
 	
 		byte[] st_byte = StaticMethod.timeStampToBytes(st);
-		System.arraycopy(st_byte, 0, data, 14, 8);
+		System.arraycopy(st_byte, 0, data, StaticVariable.PROTOCOL_CONTROL_DATATIME_START, 8);
 		
-		data[22] = (byte)0x00;
-		data[23] = (byte)0x1c;	//28 bytes for 02 data without actual data (m bytes)
+		data[StaticVariable.PROTOCOL_CONTROL_DATALENGTH_START] = (byte)0x00;
+		data[StaticVariable.PROTOCOL_CONTROL_DATALENGTH_START+1] = (byte)0x18;	//24 bytes for 02 data without actual data (m bytes)
 	
-		String device = eventMessage.getDevice();
-		System.arraycopy(device.getBytes(), 0, data, 24, device.getBytes().length);
-		for(int i = device.getBytes().length; i<8; i++) {
-			data[i + 24] = (byte)0x00;
-		}
+		int line = eventMessage.getDevice();
+		System.arraycopy(StaticMethod.intToByteArray(line), 0, data, StaticVariable.PROTOCOL_CONTROL_LINE_START, 4);
 		
-		data[32] = (byte)0x00;
-		data[33] = (byte)0x00;
+		int device = eventMessage.getDevice();
+		System.arraycopy(StaticMethod.intToByteArray(device), 0, data, StaticVariable.PROTOCOL_CONTROL_DEVICE_START, 4);		
+		data[StaticVariable.PROTOCOL_CONTROL_DEVICE_START+4] = (byte)0x00;
+		data[StaticVariable.PROTOCOL_CONTROL_DEVICE_START+5] = (byte)0x00;
 		
-		String db = eventMessage.getDataBlock();
-		System.arraycopy(db.getBytes(), 0, data, 34, db.getBytes().length);
-		for(int i = db.getBytes().length; i<8; i++) {
-			data[i + 34] = (byte)0x00;
-		}
+		int db = eventMessage.getDataBlock();
+		System.arraycopy(StaticMethod.intToByteArray(db), 0, data, StaticVariable.PROTOCOL_CONTROL_DB_START, 4);
 		
 		byte[] sp_byte = StaticMethod.timeStampToBytes(sp);
-		System.arraycopy(sp_byte, 0, data, 42, 8);
+		System.arraycopy(sp_byte, 0, data, StaticVariable.PROTOCOL_CONTROL_SAMPLETIME_START, 8);
 		
-		data[50] = (byte)0x00;
-		data[51] = (byte)0x00;
+		data[StaticVariable.PROTOCOL_CONTROL_REALDATALENGTH_START] = (byte)0x00;
+		data[StaticVariable.PROTOCOL_CONTROL_REALDATALENGTH_START+1] = (byte)0x00;
 		
-		data[52] = CRC8.calcCrc8WithoutPrefix(data);
+		data[44] = CRC8.calcCrc8WithoutPrefix(data);
 		
 		return data;
 	}	

@@ -13,7 +13,7 @@ public class StationBean implements Serializable {
 	private int id;
 	private String stationCode;
 	private Timestamp createTime;
-	private String factoryCode;
+	private int factoryId;
 	private String stationName;
 	private String stationDescription;
 	private int stationStatus;
@@ -36,11 +36,11 @@ public class StationBean implements Serializable {
 	public void setCreateTime(Timestamp createTime) {
 		this.createTime = createTime;
 	}
-	public String getFactoryCode() {
-		return factoryCode;
+	public int getFactoryId() {
+		return factoryId;
 	}
-	public void setFactoryCode(String factoryCode) {
-		this.factoryCode = factoryCode;
+	public void setFactoryId(int factoryId) {
+		this.factoryId = factoryId;
 	}
 	public String getStationName() {
 		return stationName;
@@ -68,7 +68,7 @@ public class StationBean implements Serializable {
 		this.id = json.getIntValue("id");
 		this.stationCode = json.getString("station_code");
 		this.createTime = StaticMethod.getTimestamp(json.getString("create_time"));
-		this.factoryCode = json.getString("factory_code");
+		this.factoryId = json.getIntValue("factory_id");
 		this.stationName = json.getString("station_name");
 		this.stationDescription = json.getString("station_description");
 		this.stationStatus = json.getIntValue("station_status");		

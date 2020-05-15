@@ -32,8 +32,7 @@ public class LogoutAnalyse extends AbstractAnalyse {
 	public void processMessage() {
 		byte[] sourceData = this.dataPackage.getSourceData();
 		int dataLength = sourceData.length;
-		String station = new String( Arrays.copyOfRange(sourceData, StaticVariable.PROTOCOL_CONTROL_STATION_START, 
-				StaticVariable.PROTOCOL_CONTROL_STATION_START + StaticVariable.PROTOCOL_CONTROL_STATION_LENGTH ) ).trim();
+		int station = ByteArrayUtil.getIntLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_STATION_START); 	
 //		Timestamp logoutTime = StaticMethod.getTimestampOrigin( sourceData, StaticVariable.PROTOCOL_CONTROL_DATATIME_START);
 		short logoutSeq = ByteArrayUtil.getShortLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_LOGINSEQ_START);
 		Timestamp logoutTime = new Timestamp(System.currentTimeMillis());

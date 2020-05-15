@@ -20,7 +20,7 @@ public class StationServiceImpl extends BaseServiceImpl<StationBean, String> imp
 		return stationDAO;
 	}
 	
-	public boolean validateStation(String id) {
+	public boolean validateStation(int id) {
 		StationBean bean = getStationBean(id);
 		if(bean == null || bean.getStationStatus() != 2)
 			return false;
@@ -28,8 +28,8 @@ public class StationServiceImpl extends BaseServiceImpl<StationBean, String> imp
 		return true;
 	}
 	
-	public StationBean getStationBean(String id) {
-		String stationJson = JedisOperater.getStation(id);
+	public StationBean getStationBean(int id) {
+		String stationJson = JedisOperater.getStation(String.valueOf(id));
 		if(StaticMethod.isNull(stationJson))
 			return null;
 		StationBean bean = new StationBean();
