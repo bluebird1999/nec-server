@@ -29,11 +29,11 @@ public abstract class AbsResolve implements Resolve {
 		statusList.add(statusMessage);
 	}
 	
-	protected String translate(int s) {
+	protected String translate(long s) {
 		String value = "";
 		try {
 			if(decoder.getDataPrecision() == 1) {
-				int v = s + decoder.getDataDeviation();
+				long v = s + decoder.getDataDeviation();
 				value = "" + v;
 			} else {
 				double d = (s + decoder.getDataDeviation()) * decoder.getDataPrecision();

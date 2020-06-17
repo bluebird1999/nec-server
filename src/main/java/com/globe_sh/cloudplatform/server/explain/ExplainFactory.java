@@ -34,6 +34,10 @@ public class ExplainFactory {
 			return new Bit4Resolve(bean);
 		if(StaticVariable.PARAMETER_TYPE_REAL.equals(bean.getDataType())) 
 			return new RealResolve(bean);
+		if(StaticVariable.PARAMETER_TYPE_INT.equals(bean.getDataType())) 
+			return new IntResolve(bean);
+		if(StaticVariable.PARAMETER_TYPE_DINT.equals(bean.getDataType())) 
+			return new DIntResolve(bean);
 		
 		return null;
 	}

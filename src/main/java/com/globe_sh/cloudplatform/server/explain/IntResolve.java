@@ -5,29 +5,31 @@ import com.globe_sh.cloudplatform.common.util.StaticMethod;
 import com.globe_sh.cloudplatform.server.entity.DecoderBean;
 import com.globe_sh.cloudplatform.server.util.DictUtil;
 
-public class WordResolve extends AbsResolve {
+public class IntResolve extends AbsResolve {
 
 	
-	public WordResolve(DecoderBean decoder) {
+	public IntResolve(DecoderBean decoder) {
 		super(decoder);
 	}
 	
 	public void execute() {
 		int startIndex = start + decoder.getStartByte();
-		int s = 0;
+		short s = 0;
+		int v = 0;
 		if("1".equals(decoder.getLowPrecede())) {
-			s = ByteArrayUtil.getWord(data, startIndex);
+			s = ByteArrayUtil.getShort(data, startIndex);
 		} else {
-			s = ByteArrayUtil.getWordLowEnd(data, startIndex);
+			s = ByteArrayUtil.getShortLowEnd(data, startIndex);
 		}
+		v = s;
 		
 		String dict = decoder.getDataDictionary();
 		String value = "";
 		
 		if(!StaticMethod.isNull(dict)) {
-			value = DictUtil.getInstance().getDictValue(StaticMethod.intToHexString(s), dict);
+			value = DictUtil.getInstance().getDictValue(StaticMethod.intToHexString(v), dict);
 		} else {
-			value = translate(s);
+			value = translate(v);
 		}
 		endResolve(value);
 	}
