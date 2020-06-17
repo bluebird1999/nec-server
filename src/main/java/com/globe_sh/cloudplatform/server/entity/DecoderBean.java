@@ -130,6 +130,7 @@ public class DecoderBean {
 		this.dataDeviation = json.getIntValue("data_deviation");							//参数长度
 		this.dataUnit = json.getIntValue("data_unit");												//参数单位
 		this.dataDictionary = json.getString("data_dictionary");											//低字节在前
+		this.lowPrecede = String.valueOf( json.getIntValue("low_precede") );
 	}
 
 	private int id;
@@ -147,5 +148,5 @@ public class DecoderBean {
 	private int dataDeviation;
 	private int dataUnit;
 	private String dataDictionary;
-	private String lowPrecede="1";
+	private String lowPrecede;
 }
