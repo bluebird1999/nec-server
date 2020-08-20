@@ -55,10 +55,10 @@ public class StatusAnalyse extends AbstractAnalyse {
 			this.exchange.getIn().setBody(statusJsonString.getBytes());
 			
 			//***send response directly to activeMq
-			response.setSourceData( getSendData() );
-			response.setClientId( dataPackage.getClientId() );
-			response.pack();
-			ActivemqOperater.getInstance().sendMessage("data-south", response.getTargetData());			
+//			response.setSourceData( getSendData() );
+//			response.setClientId( dataPackage.getClientId() );
+//			response.pack();
+//			ActivemqOperater.getInstance().sendMessage("data-south", response.getTargetData());			
 		}
 	}
 	

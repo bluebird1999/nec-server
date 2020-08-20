@@ -9,7 +9,7 @@
 	
 	<camelContext id="camelSpringContext" xmlns="http://camel.apache.org/schema/spring">
 		<route id="northDataMessage">
-			<from uri="activemq:topic:data-north" />
+			<from uri="activemq:queue:data-north" />
 			<process ref="northMessageProcess" />
 			<choice>
            		<when>
