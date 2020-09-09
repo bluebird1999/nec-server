@@ -51,7 +51,7 @@ public class StatusAnalyse extends AbstractAnalyse {
 		if(eventMessage != null) {
 			this.exchange.getIn().setHeader("send", StaticVariable.ROUTE_HEAD_STATUS);		
 			String statusJsonString = eventMessage.getJsonString();
-			logger.info("Process Message:" + statusJsonString);
+//			logger.info("Process Message:" + statusJsonString);
 			this.exchange.getIn().setBody(statusJsonString.getBytes());
 			
 			//***send response directly to activeMq
@@ -72,7 +72,7 @@ public class StatusAnalyse extends AbstractAnalyse {
 		stationService = (StationServiceImpl)SpringManager.registerSpring().getApplicationContext().getBean("stationService");
 		sourceData = this.dataPackage.getSourceData();
 		
-		logger.info("Data: " + StaticMethod.bytesToHexString(sourceData));
+//		logger.info("Data: " + StaticMethod.bytesToHexString(sourceData));
 		station = ByteArrayUtil.getIntLowEnd(sourceData, StaticVariable.PROTOCOL_CONTROL_STATION_START); 	
 		uuid = StaticMethod.get32UUID();
 		statusTime = StaticMethod.getTimestampOrigin(sourceData, StaticVariable.PROTOCOL_CONTROL_DATATIME_START);
