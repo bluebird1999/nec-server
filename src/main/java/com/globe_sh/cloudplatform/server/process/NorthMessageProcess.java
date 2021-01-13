@@ -17,7 +17,7 @@ public class NorthMessageProcess implements Processor {
 	public void process(Exchange message) {
 		logger.info("Process Message From Agent. ###start###");
 		byte[] exchange = (byte[])message.getIn().getBody();
-//		logger.info("Data: " + StaticMethod.bytesToHexString(exchange));
+		logger.info("Data: " + StaticMethod.bytesToHexString(exchange));
 		try {
 			if(!StaticMethod.isNull(exchange)) {
 				DataPackage dataPackage = new DataPackage(exchange);
@@ -34,7 +34,7 @@ public class NorthMessageProcess implements Processor {
 						analyse.nextProcess();
 						logger.info("Data By BCC Validate Success.");
 					} else {
-//						logger.warn("No Analyse: " + StaticMethod.bytesToHexString(exchange));
+						logger.warn("No Analyse: " + StaticMethod.bytesToHexString(exchange));
 						processDirtyData(message, exchange);
 						logger.error("No Analyse......");
 					}
