@@ -38,6 +38,8 @@ public class ExplainFactory {
 			return new IntResolve(bean);
 		if(StaticVariable.PARAMETER_TYPE_DINT.equals(bean.getDataType())) 
 			return new DIntResolve(bean);
+		if(StaticVariable.PARAMETER_TYPE_STRING.equals(bean.getDataType())) 
+			return new StringResolve(bean);		
 		
 		return null;
 	}
