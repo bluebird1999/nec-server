@@ -13,6 +13,7 @@ public class StringResolve extends AbsResolve {
 		int startIndex = start + decoder.getStartByte();
 		int length = decoder.getDataLength();
 		String value = new String(data, startIndex, length); 
+		value = value.split("\u0000")[0];
 		endResolve(value);
 	}
 }
