@@ -68,7 +68,7 @@ public class StationBean implements Serializable {
 		this.id = json.getIntValue("id");
 		this.stationCode = json.getString("station_code");
 		this.createTime = StaticMethod.getTimestamp(json.getString("create_time"));
-		this.factoryId = json.getIntValue("factory_id");
+		this.factoryId = json.getIntValue("fid");
 		this.stationName = json.getString("station_name");
 		this.stationDescription = json.getString("station_description");
 		this.stationStatus = json.getIntValue("station_status");		
